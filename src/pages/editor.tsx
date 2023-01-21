@@ -1,7 +1,14 @@
 import type { NextPage } from "next";
 import { useState } from "react";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
-import { Textarea, Container, Card, Switch, Stack } from "@mantine/core";
+import {
+  Textarea,
+  Container,
+  Card,
+  Switch,
+  Stack,
+  TypographyStylesProvider,
+} from "@mantine/core";
 
 const EditorPage: NextPage = () => {
   const [isShowPreview, setIsShowPreview] = useState(false);
@@ -23,11 +30,13 @@ const EditorPage: NextPage = () => {
         />
         {isShowPreview ? (
           <Card shadow="xs" p="sm" radius="md" withBorder>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: html,
-              }}
-            />
+            <TypographyStylesProvider>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: html,
+                }}
+              />
+            </TypographyStylesProvider>
           </Card>
         ) : (
           <Textarea
