@@ -24,6 +24,11 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
+"@hiromu617/markdown-parser@^1.0.0":
+  version "1.0.0"
+  resolved "https://npm.pkg.github.com/download/@hiromu617/markdown-parser/1.0.0/a4a696467fcef768a9386ca1d5a7ab6d8f7a430b#a4a696467fcef768a9386ca1d5a7ab6d8f7a430b"
+  integrity sha512-Mt+UdxFT3dC93K54lhK0TtU7YofgHtQo5UyuDGf7UVj9aHmJneSbUHkbvt9rBokkLUChEs9qlFBgpC1JTKsmFg==
+
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.8.tgz#03595ac2075a4dc0f191cc2131de14fbd7d410b9"
