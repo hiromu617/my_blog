@@ -56,15 +56,11 @@ export default function App(props: AppProps) {
             styles={(theme) => ({
               main: {
                 backgroundColor:
-                  theme.colorScheme === "dark"
-                    ? theme.colors.dark[8]
-                    : theme.colors.gray[0],
+                  theme.colorScheme === "dark" ? theme.colors.dark[8] : "#fff",
               },
             })}
           >
-            <Container size="xs" p={isSP ? 0 : undefined}>
-              <Component {...pageProps} />
-            </Container>
+            <Component {...pageProps} />
           </AppShell>
         </MantineProvider>
       </ColorSchemeProvider>
