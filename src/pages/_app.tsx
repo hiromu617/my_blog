@@ -5,7 +5,6 @@ import {
   AppShell,
   ColorSchemeProvider,
   ColorScheme,
-  Container,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { AppHeader } from "@/components/Layout/AppHeader";
