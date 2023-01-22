@@ -1,5 +1,4 @@
 import { AppProps } from "next/app";
-import { useState } from "react";
 import Head from "next/head";
 import {
   MantineProvider,
@@ -8,6 +7,7 @@ import {
   ColorScheme,
   Container,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { AppHeader } from "@/components/Layout/AppHeader";
 import { useLocalStorage } from "@mantine/hooks";
 
@@ -18,6 +18,7 @@ export default function App(props: AppProps) {
     defaultValue: "light",
     getInitialValueInEffect: true,
   });
+  const isSP = useMediaQuery("(max-width: 576px)");
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
@@ -50,7 +51,7 @@ export default function App(props: AppProps) {
           }}
         >
           <AppShell
-            padding="md"
+            padding={isSP ? "sm" : "lg"}
             header={<AppHeader />}
             styles={(theme) => ({
               main: {
@@ -61,7 +62,7 @@ export default function App(props: AppProps) {
               },
             })}
           >
-            <Container>
+            <Container size="xs" p={isSP ? 0 : undefined}>
               <Component {...pageProps} />
             </Container>
           </AppShell>

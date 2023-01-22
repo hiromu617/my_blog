@@ -3,7 +3,6 @@ import { useState } from "react";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
 import {
   Textarea,
-  Container,
   Card,
   Switch,
   Stack,
@@ -16,41 +15,39 @@ const EditorPage: NextPage = () => {
   const [html, setHtml] = useState("");
 
   return (
-    <Container my={100}>
-      <Stack style={{ width: 600, margin: "auto", minHeight: "1000px" }}>
-        <Switch
-          label="Show preview"
-          size="lg"
-          checked={isShowPreview}
+    <Stack>
+      <Switch
+        label="Show preview"
+        size="lg"
+        checked={isShowPreview}
+        onChange={(e) => {
+          setIsShowPreview(e.target.checked);
+          const html = convertToHTMLString(markdown);
+          setHtml(html);
+        }}
+      />
+      {isShowPreview ? (
+        <Card p="sm" radius="md" withBorder>
+          <TypographyStylesProvider>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: html,
+              }}
+            />
+          </TypographyStylesProvider>
+        </Card>
+      ) : (
+        <Textarea
+          minRows={30}
+          autosize
+          value={markdown}
           onChange={(e) => {
-            setIsShowPreview(e.target.checked);
-            const html = convertToHTMLString(markdown);
-            setHtml(html);
+            setMarkdown(e.target.value);
           }}
+          style={{ width: "100%" }}
         />
-        {isShowPreview ? (
-          <Card shadow="xs" p="sm" radius="md" withBorder>
-            <TypographyStylesProvider>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: html,
-                }}
-              />
-            </TypographyStylesProvider>
-          </Card>
-        ) : (
-          <Textarea
-            minRows={50}
-            autosize
-            value={markdown}
-            onChange={(e) => {
-              setMarkdown(e.target.value);
-            }}
-            style={{ width: "100%" }}
-          />
-        )}
-      </Stack>
-    </Container>
+      )}
+    </Stack>
   );
 };
 
