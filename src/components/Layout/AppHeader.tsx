@@ -4,6 +4,7 @@ import {
   Header,
   ActionIcon,
   useMantineColorScheme,
+  Flex,
 } from "@mantine/core";
 import { TbSun, TbMoonStars } from "react-icons/tb";
 import { NextLink } from "@mantine/next";
@@ -15,7 +16,7 @@ export const AppHeader: FC = () => {
   return (
     <Header
       height={60}
-      p="xs"
+      p="lg"
       display="flex"
       style={{
         alignItems: "center",
@@ -32,15 +33,27 @@ export const AppHeader: FC = () => {
       >
         🛹
       </Button>
-      <ActionIcon
-        variant="subtle"
-        color={dark ? "yellow" : "blue"}
-        onClick={() => toggleColorScheme()}
-        title="Toggle color scheme"
-        size="lg"
-      >
-        {dark ? <TbSun size={18} /> : <TbMoonStars size={18} />}
-      </ActionIcon>
+      <Flex gap={20} align="center">
+        <ActionIcon
+          variant="subtle"
+          color={dark ? "orange" : "dark"}
+          onClick={() => toggleColorScheme()}
+          title="Toggle color scheme"
+          size="lg"
+        >
+          {dark ? <TbSun size={18} /> : <TbMoonStars size={18} />}
+        </ActionIcon>
+        <Button
+          color={dark ? "blue" : "dark"}
+          radius="md"
+          size="md"
+          component={NextLink}
+          href="/about"
+          legacyBehavior
+        >
+          About
+        </Button>
+      </Flex>
     </Header>
   );
 };
