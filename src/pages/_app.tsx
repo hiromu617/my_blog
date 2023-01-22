@@ -4,19 +4,20 @@ import Head from "next/head";
 import {
   MantineProvider,
   AppShell,
-  Button,
-  Header,
   ColorSchemeProvider,
   ColorScheme,
-  ActionIcon,
   Container,
 } from "@mantine/core";
-import { TbSun, TbMoonStars } from "react-icons/tb";
-import { NextLink } from "@mantine/next";
+import { AppHeader } from "@/components/Layout/AppHeader";
+import { useLocalStorage } from "@mantine/hooks";
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
+  const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
+    key: "mantine-color-scheme",
+    defaultValue: "light",
+    getInitialValueInEffect: true,
+  });
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
@@ -50,41 +51,7 @@ export default function App(props: AppProps) {
         >
           <AppShell
             padding="md"
-            header={
-              <Header
-                height={60}
-                p="xs"
-                display="flex"
-                style={{
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Button
-                  variant="subtle"
-                  color="dark"
-                  fz={36}
-                  component={NextLink}
-                  href="/"
-                  legacyBehavior
-                >
-                  🛹
-                </Button>
-                <ActionIcon
-                  variant="subtle"
-                  color={colorScheme === "dark" ? "yellow" : "blue"}
-                  onClick={() => toggleColorScheme()}
-                  title="Toggle color scheme"
-                  size="lg"
-                >
-                  {colorScheme === "dark" ? (
-                    <TbSun size={18} />
-                  ) : (
-                    <TbMoonStars size={18} />
-                  )}
-                </ActionIcon>
-              </Header>
-            }
+            header={<AppHeader />}
             styles={(theme) => ({
               main: {
                 backgroundColor:
