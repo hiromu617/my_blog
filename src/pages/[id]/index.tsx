@@ -16,7 +16,7 @@ export default function ArticlePage() {
   return (
     <Container size="sm">
       <Stack spacing="lg">
-        <Title weight={500}>
+        <Title weight={500} ta="center">
           console.log()だけのデバッグはやめよう
         </Title>
         <Group mb={6} m="auto">
