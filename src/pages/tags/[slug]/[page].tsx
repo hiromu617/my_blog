@@ -73,17 +73,14 @@ export const getServerSideProps = async (context: any) => {
     .select(
       `
     *,
-    article_tags!inner (
-      tag_id
-    ),
-    tags (
+    tags!inner (
       name,
       slug
     )
     `,
       { count: "exact" }
     )
-    .in("article_tags.tag_id", [tags[0].id])
+    .in("tags.slug", [slug])
     .range(start, end);
 
   assertExists(count);
