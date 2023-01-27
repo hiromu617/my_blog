@@ -1,6 +1,6 @@
 import { Center, Container, Text } from "@mantine/core";
 import { supabase } from "@/lib/supabaseClient";
-import { NextPage, InferGetStaticPropsType } from "next";
+import { NextPage, InferGetServerSidePropsType } from "next";
 import { ArticleList } from "@/features/Article/components/ArticleList";
 import { AppPagination } from "@/components/Layout/AppPagination";
 import { assertExists } from "@/utils/assert";
@@ -10,7 +10,7 @@ import { PAGE_SIZE } from "@/const";
 const range = (start: number, end: number) =>
   [...Array(end - start + 1)].map((_, i) => start + i);
 
-type Props = InferGetStaticPropsType<typeof getServerSideProps>;
+type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 const TagPageIndexPage: NextPage<Props> = ({ articles, totalCount, tag }) => {
   return (
