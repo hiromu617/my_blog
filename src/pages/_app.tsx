@@ -18,7 +18,6 @@ export default function App(props: AppProps) {
     defaultValue: "light",
     getInitialValueInEffect: true,
   });
-  const isSP = useMediaQuery("(max-width: 576px)");
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
@@ -52,7 +51,6 @@ export default function App(props: AppProps) {
         >
           <NotificationsProvider>
             <AppShell
-              padding={isSP ? "sm" : "lg"}
               header={<AppHeader />}
               styles={(theme) => ({
                 main: {
