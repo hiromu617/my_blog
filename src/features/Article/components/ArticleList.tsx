@@ -11,28 +11,25 @@ export const ArticleList: FC<Props> = ({ articles }) => {
   return (
     <Stack spacing="lg">
       {articles.map((article) => (
-        <Card
-          key={article.slug}
-          radius="md"
-          withBorder
-          component={NextLink}
-          href={`/${article.slug}`}
-          sx={(theme) => ({
-            "&:hover": {
-              backgroundColor:
-                theme.colorScheme === "dark"
-                  ? theme.colors.dark[8]
-                  : theme.colors.gray[0],
-            },
-          })}
-          legacyBehavior
-        >
-          <Text weight={500} fz="xl" mb={6}>
+        <Card key={article.slug} radius="md" withBorder>
+          <Anchor
+            weight={500}
+            fz="xl"
+            mb={6}
+            component={NextLink}
+            href={`/${article.slug}`}
+            legacyBehavior
+          >
             {article.title}
-          </Text>
+          </Anchor>
           <Group mb={6}>
             {article.tags.map((tag) => (
-              <Anchor href={`/tags/${tag.slug}`} key={tag.slug}>
+              <Anchor
+                href={`/tags/${tag.slug}/1`}
+                component={NextLink}
+                key={tag.slug}
+                legacyBehavior
+              >
                 # {tag.name}
               </Anchor>
             ))}
