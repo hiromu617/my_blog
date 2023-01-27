@@ -10,9 +10,13 @@ import {
   Container,
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
+import { supabase } from "@/lib/supabaseClient";
+import { NextPage, InferGetStaticPropsType } from "next";
 import { useMediaQuery } from "@mantine/hooks";
 
-export default function Home() {
+type Props = InferGetStaticPropsType<typeof getStaticProps>;
+
+const IndexPage: NextPage<Props> = ({ articles }) => {
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   const isSP = useMediaQuery("(max-width: 576px)");
@@ -20,13 +24,13 @@ export default function Home() {
   return (
     <Container size="xs" p={isSP ? 0 : undefined}>
       <Stack spacing="lg">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
+        {articles.map((article) => (
           <Card
-            key={i}
+            key={article.slug}
             radius="md"
             withBorder
             component={NextLink}
-            href={`/${i}`}
+            href={`/${article.slug}`}
             sx={(theme) => ({
               "&:hover": {
                 backgroundColor:
@@ -38,7 +42,7 @@ export default function Home() {
             legacyBehavior
           >
             <Text weight={500} fz="xl" mb={6}>
-              console.log()だけのデバッグはやめよう
+              {article.title}
             </Text>
             <Group mb={6}>
               <Anchor href="https://asds"># React</Anchor>
@@ -53,4 +57,16 @@ export default function Home() {
       </Stack>
     </Container>
   );
-}
+};
+
+export default IndexPage;
+
+export const getStaticProps = async () => {
+  const { data: articles, error } = await supabase.from("articles").select("*");
+
+  return {
+    props: {
+      articles: articles ?? [],
+    },
+  };
+};
