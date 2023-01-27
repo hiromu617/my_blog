@@ -47,7 +47,11 @@ const ArticlePage: NextPage<Props> = ({ article, htmlContent }) => {
 export default ArticlePage;
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: articles, error } = await supabase.from("articles").select("*");
+  const { data: articles, error } = await supabase
+    .from("articles")
+    .select("*")
+    .not("published_at", "is", null);
+
   assertExists(articles);
   const paths = articles.map((a) => `/${a.slug}`);
 

@@ -62,7 +62,10 @@ const IndexPage: NextPage<Props> = ({ articles }) => {
 export default IndexPage;
 
 export const getStaticProps = async () => {
-  const { data: articles, error } = await supabase.from("articles").select("*");
+  const { data: articles, error } = await supabase
+    .from("articles")
+    .select("*")
+    .not("published_at", "is", null);
 
   return {
     props: {
