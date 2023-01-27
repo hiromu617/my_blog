@@ -13,7 +13,7 @@ const IndexPage: NextPage<Props> = ({ articles, totalCount }) => {
     <Container size="xs">
       <ArticleList articles={articles} />
       <Center my={20}>
-        <AppPagination totalCount={totalCount} currentPage={1} />
+        <AppPagination totalCount={totalCount} />
       </Center>
     </Container>
   );

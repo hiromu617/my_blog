@@ -11,19 +11,12 @@ const range = (start: number, end: number) =>
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
-const PageIndexPage: NextPage<Props> = ({
-  articles,
-  totalCount,
-  currentPage,
-}) => {
+const PageIndexPage: NextPage<Props> = ({ articles, totalCount }) => {
   return (
     <Container size="xs">
       <ArticleList articles={articles} />
       <Center my={20}>
-        <AppPagination
-          totalCount={totalCount}
-          currentPage={currentPage}
-        />
+        <AppPagination totalCount={totalCount} />
       </Center>
     </Container>
   );
@@ -67,7 +60,6 @@ export const getStaticProps = async (context: any) => {
     props: {
       articles: articles ?? [],
       totalCount: count,
-      currentPage: page,
     },
   };
 };

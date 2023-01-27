@@ -5,18 +5,18 @@ import { PAGE_SIZE } from "@/const";
 
 type Props = {
   totalCount: number;
-  currentPage: number;
 };
-export const AppPagination: FC<Props> = ({ totalCount, currentPage }) => {
+export const AppPagination: FC<Props> = ({ totalCount }) => {
   const router = useRouter();
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   const total = Math.ceil(totalCount / PAGE_SIZE);
+  const page = Number(router.query.page ?? 1);
 
   return (
     <Pagination
       total={total}
-      page={currentPage}
+      page={page}
       color={dark ? "blue" : "dark"}
       radius="md"
       onChange={(page) => {
