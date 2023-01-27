@@ -28,8 +28,7 @@ export const getStaticPaths = async () => {
   const { count } = await supabase
     .from("articles")
     .select("*", { count: "exact" })
-    .not("published_at", "is", null)
-    .order("published_at", { ascending: true });
+    .not("published_at", "is", null);
   assertExists(count);
 
   const paths = range(2, Math.ceil(count / PAGE_SIZE)).map(
@@ -50,8 +49,7 @@ export const getStaticProps = async (context: any) => {
   } = await supabase
     .from("articles")
     .select("*", { count: "exact" })
-    .not("published_at", "is", null)
-    .order("published_at", { ascending: true })
+    .order("published_at", { ascending: false })
     .range(start, end);
 
   assertExists(count);

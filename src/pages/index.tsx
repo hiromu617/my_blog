@@ -30,7 +30,7 @@ export const getStaticProps = async () => {
     .from("articles")
     .select("*", { count: "exact" })
     .not("published_at", "is", null)
-    .order("published_at", { ascending: true })
+    .order("published_at", { ascending: false })
     .range(0, PAGE_SIZE - 1);
 
   if (error) {
