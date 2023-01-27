@@ -31,6 +31,26 @@ export interface Database {
   }
   public: {
     Tables: {
+      article_tags: {
+        Row: {
+          article_id: number
+          created_at: string | null
+          id: number
+          tag_id: number
+        }
+        Insert: {
+          article_id: number
+          created_at?: string | null
+          id?: number
+          tag_id: number
+        }
+        Update: {
+          article_id?: number
+          created_at?: string | null
+          id?: number
+          tag_id?: number
+        }
+      }
       articles: {
         Row: {
           content: string
@@ -55,6 +75,26 @@ export interface Database {
           published_at?: string | null
           slug?: string
           title?: string
+        }
+      }
+      tags: {
+        Row: {
+          created_at: string | null
+          id: number
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          name?: string
+          slug?: string
         }
       }
     }

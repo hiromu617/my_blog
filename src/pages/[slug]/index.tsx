@@ -11,6 +11,7 @@ import {
 import { GetStaticPaths, InferGetStaticPropsType, NextPage } from "next";
 import { assertExists } from "@/utils/assert";
 import { supabase } from "@/lib/supabaseClient";
+import { ArticleWithTags } from "@/features/types";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -26,8 +27,11 @@ const ArticlePage: NextPage<Props> = ({ article, htmlContent }) => {
           {article.title}
         </Title>
         <Group mb={6} m="auto">
-          <Anchor href="https://asds"># React</Anchor>
-          <Anchor href="https://asds"># Next.js</Anchor>
+          {article.tags.map((tag) => (
+            <Anchor href={`/tags/${tag.slug}/1`} key={tag.slug}>
+              # {tag.name}
+            </Anchor>
+          ))}
         </Group>
         <Text component="time" ta="center">
           2023.01.22
@@ -62,7 +66,15 @@ export const getStaticProps = async (context: any) => {
   const slug = context.params.slug;
   const { data: articles, error } = await supabase
     .from("articles")
-    .select("*")
+    .select(
+      `
+    *,
+    tags (
+      name,
+      slug
+    )
+  `
+    )
     .eq("slug", slug);
 
   assertExists(articles?.[0]);
@@ -72,7 +84,7 @@ export const getStaticProps = async (context: any) => {
 
   return {
     props: {
-      article,
+      article: article as ArticleWithTags,
       htmlContent,
     },
   };

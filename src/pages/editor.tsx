@@ -1,9 +1,8 @@
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
 import {
   Textarea,
-  Card,
   Switch,
   Stack,
   TypographyStylesProvider,
@@ -12,16 +11,24 @@ import {
   Group,
   Title,
   Button,
+  Checkbox,
   useMantineColorScheme,
+  Collapse,
 } from "@mantine/core";
 import { supabase } from "@/lib/supabaseClient";
 import { useLocalStorage } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
+import { InferGetServerSidePropsType } from "next";
+import { assertExists } from "@/utils/assert";
 
-const EditorPage: NextPage = () => {
+type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
+
+const EditorPage: NextPage<Props> = ({ tags }) => {
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   const [isShowPreview, setIsShowPreview] = useState(false);
+  const [tagInputOpened, setTagInputOpened] = useState(false);
+  const [selectedTagId, setSelectedTagId] = useState<number[]>([]);
   const [html, setHtml] = useState("");
   const [slug, setSlug] = useState("");
   const [markdown, setMarkdown] = useLocalStorage({
@@ -39,14 +46,29 @@ const EditorPage: NextPage = () => {
     // TODO: validation
     // TODO: webhookでbuild
     const date = new Date();
-    const { error } = await supabase.from("articles").insert({
-      title,
-      content: markdown,
-      slug,
-      published_at: date.toLocaleString(),
-    });
+    const { data: articles, error } = await supabase
+      .from("articles")
+      .insert({
+        title,
+        content: markdown,
+        slug,
+        published_at: date.toLocaleString(),
+      })
+      .select();
+    assertExists(articles?.[0]);
+
+    const { error: errorOnCreateRelation } = await supabase
+      .from("article_tags")
+      .insert(
+        selectedTagId.map((tag_id) => ({ tag_id, article_id: articles[0].id }))
+      );
+
     if (error) {
       alert(error.message);
+      return;
+    }
+    if (errorOnCreateRelation) {
+      alert(errorOnCreateRelation.message);
       return;
     }
     showNotification({
@@ -56,6 +78,16 @@ const EditorPage: NextPage = () => {
     setTitle("");
     setMarkdown("");
     setSlug("");
+    setSelectedTagId([]);
+  };
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const id = +e.target.value;
+    if (selectedTagId.includes(id)) {
+      setSelectedTagId(selectedTagId.filter((old) => old !== id));
+    } else {
+      setSelectedTagId([...selectedTagId, id]);
+    }
   };
 
   return (
@@ -88,6 +120,22 @@ const EditorPage: NextPage = () => {
             公開する
           </Button>
         </Group>
+        <Button onClick={() => setTagInputOpened((o) => !o)} variant="subtle">
+          Tags
+        </Button>
+        <Collapse in={tagInputOpened}>
+          <Stack>
+            {tags?.map((tag) => (
+              <Checkbox
+                key={tag.id}
+                label={tag.name}
+                value={tag.id}
+                checked={selectedTagId.includes(tag.id)}
+                onChange={onChange}
+              />
+            ))}
+          </Stack>
+        </Collapse>
         {isShowPreview ? (
           <>
             <Title weight={500} ta="center">
@@ -127,3 +175,13 @@ const EditorPage: NextPage = () => {
 };
 
 export default EditorPage;
+
+export const getServerSideProps = async () => {
+  const { data: tags } = await supabase.from("tags").select("*");
+
+  return {
+    props: {
+      tags,
+    },
+  };
+};

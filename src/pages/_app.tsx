@@ -7,7 +7,6 @@ import {
   ColorScheme,
 } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
-import { useMediaQuery } from "@mantine/hooks";
 import { AppHeader } from "@/components/Layout/AppHeader";
 import { useLocalStorage } from "@mantine/hooks";
 
@@ -18,7 +17,6 @@ export default function App(props: AppProps) {
     defaultValue: "light",
     getInitialValueInEffect: true,
   });
-  const isSP = useMediaQuery("(max-width: 576px)");
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
@@ -52,7 +50,6 @@ export default function App(props: AppProps) {
         >
           <NotificationsProvider>
             <AppShell
-              padding={isSP ? "sm" : "lg"}
               header={<AppHeader />}
               styles={(theme) => ({
                 main: {
