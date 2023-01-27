@@ -59,6 +59,7 @@ export const getStaticProps = async (context: any) => {
   `,
       { count: "exact" }
     )
+    .not("published_at", "is", null)
     .order("published_at", { ascending: false })
     .range(start, end);
 

@@ -28,7 +28,7 @@ const ArticlePage: NextPage<Props> = ({ article, htmlContent }) => {
         </Title>
         <Group mb={6} m="auto">
           {article.tags.map((tag) => (
-            <Anchor href={`/tags/${tag.slug}`} key={tag.slug}>
+            <Anchor href={`/tags/${tag.slug}/1`} key={tag.slug}>
               # {tag.name}
             </Anchor>
           ))}
