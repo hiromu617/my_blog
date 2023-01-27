@@ -14,13 +14,16 @@ import {
   Button,
   useMantineColorScheme,
 } from "@mantine/core";
+import { supabase } from "@/lib/supabaseClient";
 import { useLocalStorage } from "@mantine/hooks";
+import { showNotification } from "@mantine/notifications";
 
 const EditorPage: NextPage = () => {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   const [isShowPreview, setIsShowPreview] = useState(false);
   const [html, setHtml] = useState("");
+  const [slug, setSlug] = useState("");
   const [markdown, setMarkdown] = useLocalStorage({
     key: "article-under-edit",
     defaultValue: "",
@@ -31,6 +34,29 @@ const EditorPage: NextPage = () => {
     defaultValue: "",
     getInitialValueInEffect: true,
   });
+
+  const handlePublish = async () => {
+    // TODO: validation
+    // TODO: webhookでbuild
+    const date = new Date();
+    const { error } = await supabase.from("articles").insert({
+      title,
+      content: markdown,
+      slug,
+      published_at: date.toDateString(),
+    });
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    showNotification({
+      title: "success",
+      message: "",
+    });
+    setTitle("");
+    setMarkdown("");
+    setSlug("");
+  };
 
   return (
     <Container size="sm">
@@ -47,7 +73,18 @@ const EditorPage: NextPage = () => {
               setHtml(html);
             }}
           />
-          <Button color={dark ? "blue" : "dark"} radius="md" size="md">
+          <Input
+            size="md"
+            placeholder="slug"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+          />
+          <Button
+            color={dark ? "blue" : "dark"}
+            radius="md"
+            size="md"
+            onClick={handlePublish}
+          >
             公開する
           </Button>
         </Group>

@@ -6,6 +6,7 @@ import {
   ColorSchemeProvider,
   ColorScheme,
 } from "@mantine/core";
+import { NotificationsProvider } from "@mantine/notifications";
 import { useMediaQuery } from "@mantine/hooks";
 import { AppHeader } from "@/components/Layout/AppHeader";
 import { useLocalStorage } from "@mantine/hooks";
@@ -49,18 +50,22 @@ export default function App(props: AppProps) {
             }),
           }}
         >
-          <AppShell
-            padding={isSP ? "sm" : "lg"}
-            header={<AppHeader />}
-            styles={(theme) => ({
-              main: {
-                backgroundColor:
-                  theme.colorScheme === "dark" ? theme.colors.dark[8] : "#fff",
-              },
-            })}
-          >
-            <Component {...pageProps} />
-          </AppShell>
+          <NotificationsProvider>
+            <AppShell
+              padding={isSP ? "sm" : "lg"}
+              header={<AppHeader />}
+              styles={(theme) => ({
+                main: {
+                  backgroundColor:
+                    theme.colorScheme === "dark"
+                      ? theme.colors.dark[8]
+                      : "#fff",
+                },
+              })}
+            >
+              <Component {...pageProps} />
+            </AppShell>
+          </NotificationsProvider>
         </MantineProvider>
       </ColorSchemeProvider>
     </>

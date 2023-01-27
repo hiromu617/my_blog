@@ -16,6 +16,7 @@
     "@mantine/core": "^5.10.1",
     "@mantine/hooks": "^5.10.1",
     "@mantine/next": "^5.10.1",
+    "@mantine/notifications": "^5.10.2",
     "@next/font": "13.1.4",
     "@supabase/supabase-js": "^2.4.1",
     "@types/node": "18.11.18",
