@@ -7,7 +7,6 @@ import {
   ColorScheme,
 } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
-import { useMediaQuery } from "@mantine/hooks";
 import { AppHeader } from "@/components/Layout/AppHeader";
 import { useLocalStorage } from "@mantine/hooks";
 
