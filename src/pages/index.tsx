@@ -5,6 +5,7 @@ import { ArticleList } from "@/features/Article/components/ArticleList";
 import { AppPagination } from "@/components/Layout/AppPagination";
 import { assertExists } from "@/utils/assert";
 import { PAGE_SIZE } from "@/const";
+import { ArticleWithTags } from "@/features/types";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -28,7 +29,16 @@ export const getStaticProps = async () => {
     count,
   } = await supabase
     .from("articles")
-    .select("*", { count: "exact" })
+    .select(
+      `
+      *,
+      tags (
+        name,
+        slug
+      )
+    `,
+      { count: "exact" }
+    )
     .not("published_at", "is", null)
     .order("published_at", { ascending: false })
     .range(0, PAGE_SIZE - 1);
@@ -41,7 +51,7 @@ export const getStaticProps = async () => {
 
   return {
     props: {
-      articles: articles ?? [],
+      articles: articles as ArticleWithTags[],
       totalCount: count,
     },
   };

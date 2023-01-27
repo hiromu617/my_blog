@@ -4,6 +4,7 @@ import { NextPage, InferGetStaticPropsType } from "next";
 import { ArticleList } from "@/features/Article/components/ArticleList";
 import { AppPagination } from "@/components/Layout/AppPagination";
 import { assertExists } from "@/utils/assert";
+import { ArticleWithTags } from "@/features/types";
 import { PAGE_SIZE } from "@/const";
 
 const range = (start: number, end: number) =>
@@ -48,7 +49,16 @@ export const getStaticProps = async (context: any) => {
     count,
   } = await supabase
     .from("articles")
-    .select("*", { count: "exact" })
+    .select(
+      `
+    *,
+    tags (
+      name,
+      slug
+    )
+  `,
+      { count: "exact" }
+    )
     .order("published_at", { ascending: false })
     .range(start, end);
 
@@ -56,7 +66,7 @@ export const getStaticProps = async (context: any) => {
 
   return {
     props: {
-      articles: articles ?? [],
+      articles: articles as ArticleWithTags[],
       totalCount: count,
     },
   };

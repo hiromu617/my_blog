@@ -1,10 +1,10 @@
 import { FC } from "react";
 import { Stack, Card, Text, Group, Anchor } from "@mantine/core";
-import { Article } from "@/features/types";
+import { ArticleWithTags } from "@/features/types";
 import { NextLink } from "@mantine/next";
 
 type Props = {
-  articles: Article[];
+  articles: ArticleWithTags[];
 };
 
 export const ArticleList: FC<Props> = ({ articles }) => {
@@ -31,8 +31,11 @@ export const ArticleList: FC<Props> = ({ articles }) => {
             {article.title}
           </Text>
           <Group mb={6}>
-            <Anchor href="https://asds"># React</Anchor>
-            <Anchor href="https://asds"># Next.js</Anchor>
+            {article.tags.map((tag) => (
+              <Anchor href={`/tags/${tag.slug}`} key={tag.slug}>
+                # {tag.name}
+              </Anchor>
+            ))}
           </Group>
           <Text>{article.published_at}</Text>
         </Card>
