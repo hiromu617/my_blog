@@ -48,7 +48,7 @@ const IndexPage: NextPage<Props> = ({ articles }) => {
               <Anchor href="https://asds"># React</Anchor>
               <Anchor href="https://asds"># Next.js</Anchor>
             </Group>
-            <Text>2023.01.22</Text>
+            <Text>{article.published_at}</Text>
           </Card>
         ))}
         <Center my={20}>
@@ -65,7 +65,8 @@ export const getStaticProps = async () => {
   const { data: articles, error } = await supabase
     .from("articles")
     .select("*")
-    .not("published_at", "is", null);
+    .not("published_at", "is", null)
+    .order("published_at", { ascending: true });
 
   return {
     props: {

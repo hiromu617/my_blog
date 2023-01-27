@@ -43,7 +43,7 @@ const EditorPage: NextPage = () => {
       title,
       content: markdown,
       slug,
-      published_at: date.toDateString(),
+      published_at: date.toLocaleString(),
     });
     if (error) {
       alert(error.message);
