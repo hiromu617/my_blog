@@ -5,6 +5,7 @@ import { ArticleList } from "@/features/Article/components/ArticleList";
 import { AppPagination } from "@/components/Layout/AppPagination";
 import { assertExists } from "@/utils/assert";
 import { ArticleWithTags } from "@/features/types";
+import { z } from "zod";
 import { PAGE_SIZE } from "@/const";
 
 const range = (start: number, end: number) =>
@@ -57,8 +58,8 @@ export default TagPageIndexPage;
 
 // SGむずいのでSSR
 export const getServerSideProps = async (context: any) => {
-  const page = context.params.page;
-  const slug = context.params.slug;
+  const page = z.number().parse(+context.params.page);
+  const slug = z.string().parse(context.params.slug);
   const start = (page - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE - 1;
 

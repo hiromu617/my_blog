@@ -5,6 +5,7 @@ import { ArticleList } from "@/features/Article/components/ArticleList";
 import { AppPagination } from "@/components/Layout/AppPagination";
 import { assertExists } from "@/utils/assert";
 import { ArticleWithTags } from "@/features/types";
+import { z } from "zod";
 import { PAGE_SIZE } from "@/const";
 
 const range = (start: number, end: number) =>
@@ -40,7 +41,7 @@ export const getStaticPaths = async () => {
 };
 
 export const getStaticProps = async (context: any) => {
-  const page = context.params.page;
+  const page = z.number().parse(+context.params.page);
   const start = (page - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE - 1;
   const {
