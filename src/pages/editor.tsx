@@ -19,9 +19,21 @@ import { supabase } from "@/lib/supabaseClient";
 import { useLocalStorage } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
 import { InferGetServerSidePropsType } from "next";
+import { z } from "zod";
 import { assertExists } from "@/utils/assert";
+import { parse } from "path";
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
+
+const schema = z.object({
+  title: z.string().min(1).max(25),
+  slug: z
+    .string()
+    .min(1)
+    .max(15)
+    .regex(/^[0-9a-zA-Z]*$/),
+  content: z.string().min(1),
+});
 
 const EditorPage: NextPage<Props> = ({ tags }) => {
   const { colorScheme } = useMantineColorScheme();
@@ -43,16 +55,17 @@ const EditorPage: NextPage<Props> = ({ tags }) => {
   });
 
   const handlePublish = async () => {
-    // TODO: validation
     // TODO: webhookでbuild
-    const date = new Date();
+    const result = schema.safeParse({ title, content: markdown, slug });
+    if (!result.success) {
+      alert(result.error.message);
+      return;
+    }
     const { data: articles, error } = await supabase
       .from("articles")
       .insert({
-        title,
-        content: markdown,
-        slug,
-        published_at: date.toLocaleString(),
+        ...result.data,
+        published_at: new Date().toLocaleString(),
       })
       .select();
     assertExists(articles?.[0]);
