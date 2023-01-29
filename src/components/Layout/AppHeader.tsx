@@ -33,7 +33,7 @@ export const AppHeader: FC = () => {
       >
         🛹
       </Button>
-      <Flex gap={20} align="center">
+      <Flex gap={10} align="center">
         <ActionIcon
           variant="subtle"
           color={dark ? "orange" : "dark"}

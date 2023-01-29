@@ -11,7 +11,7 @@ type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
 const IndexPage: NextPage<Props> = ({ articles, totalCount }) => {
   return (
-    <Container size="xs">
+    <Container size="xs" pt={20}>
       <ArticleList articles={articles} />
       <Center my={20}>
         <AppPagination totalCount={totalCount} />

@@ -12,6 +12,7 @@ import { GetStaticPaths, InferGetStaticPropsType, NextPage } from "next";
 import { assertExists } from "@/utils/assert";
 import { supabase } from "@/lib/supabaseClient";
 import { ArticleWithTags } from "@/features/types";
+import { z } from "zod";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
@@ -63,7 +64,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps = async (context: any) => {
-  const slug = context.params.slug;
+  const slug = z.string().parse(context.params.slug);
   const { data: articles, error } = await supabase
     .from("articles")
     .select(
