@@ -19,6 +19,7 @@ export const AppPagination: FC<Props> = ({ totalCount }) => {
       page={page}
       color={dark ? "blue" : "dark"}
       radius="md"
+      size="lg"
       onChange={(page) => {
         if (page === 1) return router.push("/");
         router.push(`/page/${page}`);
