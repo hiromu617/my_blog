@@ -21,7 +21,7 @@ import { showNotification } from "@mantine/notifications";
 import { InferGetServerSidePropsType } from "next";
 import { z } from "zod";
 import { assertExists } from "@/utils/assert";
-import { parse } from "path";
+import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -38,6 +38,7 @@ const schema = z.object({
 const EditorPage: NextPage<Props> = ({ tags }) => {
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
+  const { trigger } = useTriggerDeploy();
   const [isShowPreview, setIsShowPreview] = useState(false);
   const [tagInputOpened, setTagInputOpened] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState<number[]>([]);
@@ -92,6 +93,7 @@ const EditorPage: NextPage<Props> = ({ tags }) => {
     setMarkdown("");
     setSlug("");
     setSelectedTagId([]);
+    trigger();
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
