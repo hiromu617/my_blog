@@ -1,10 +1,11 @@
 import { FC, useState } from "react";
-import { Anchor, Table, Button } from "@mantine/core";
+import { Anchor, Table, Button, Center } from "@mantine/core";
 import { ArticleWithTags } from "@/features/types";
 import { NextLink } from "@mantine/next";
 import { supabase } from "@/lib/supabaseClient";
 import { showNotification } from "@mantine/notifications";
 import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
+import { mutate } from "swr";
 
 type Props = {
   articles: ArticleWithTags[];
@@ -42,6 +43,7 @@ export const DashboardArticleTable: FC<Props> = ({ articles }) => {
       console.error(error);
       return;
     }
+    await mutate("/dashboard/articles");
     showNotification({
       title: "success",
       message: "",
@@ -57,7 +59,6 @@ export const DashboardArticleTable: FC<Props> = ({ articles }) => {
           <th>スラッグ</th>
           <th>タイトル</th>
           <th>公開日</th>
-          <th>公開非公開</th>
         </tr>
       </thead>
       <tbody>
@@ -78,17 +79,20 @@ export const DashboardArticleTable: FC<Props> = ({ articles }) => {
               {article.published_at ? formatDate(article.published_at) : "-"}
             </td>
             <td>
-              <Button
-                color="dark"
-                radius="md"
-                size="sm"
-                onClick={() =>
-                  handlePublishOrUnpublish(article.id, !!article.published_at)
-                }
-                loading={isLoading}
-              >
-                {article.published_at ? "非公開にする" : "公開する"}
-              </Button>
+              <Center>
+                <Button
+                  color="dark"
+                  radius="md"
+                  size="sm"
+                  onClick={() =>
+                    handlePublishOrUnpublish(article.id, !!article.published_at)
+                  }
+                  loading={isLoading}
+                  loaderPosition="center"
+                >
+                  {article.published_at ? "非公開にする" : "公開する"}
+                </Button>
+              </Center>
             </td>
           </tr>
         ))}

@@ -1,42 +1,44 @@
 import { Container } from "@mantine/core";
 import { supabase } from "@/lib/supabaseClient";
-import { NextPage, InferGetServerSidePropsType } from "next";
+import { NextPage } from "next";
 import { DashboardArticleTable } from "@/features/Article/components/DashboardArticleTable";
+import useSWR from "swr";
 import { ArticleWithTags } from "@/features/types";
 
-type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
-
-const DashboardIndexPage: NextPage<Props> = ({ articles }) => {
-  return (
-    <Container size="md" pt={20}>
-      <DashboardArticleTable articles={articles} />
-    </Container>
-  );
-};
-
-export default DashboardIndexPage;
-
-export const getServerSideProps = async () => {
+const fetcher = async () => {
   const { data: articles, error } = await supabase
     .from("articles")
     .select(
       `
-      *,
-      tags (
-        name,
-        slug
-      )
-    `
+    *,
+    tags (
+      name,
+      slug
+    )
+  `
     )
     .order("created_at", { ascending: false });
 
   if (error) {
     console.error(error);
+    throw new Error(error.message);
   }
 
-  return {
-    props: {
-      articles: articles as ArticleWithTags[],
-    },
-  };
+  return articles as ArticleWithTags[];
 };
+
+const DashboardIndexPage: NextPage = () => {
+  const { data: articles, isLoading } = useSWR("/dashboard/articles", fetcher);
+
+  return (
+    <Container size="md" pt={20}>
+      {isLoading || !articles ? (
+        <>loading</>
+      ) : (
+        <DashboardArticleTable articles={articles} />
+      )}
+    </Container>
+  );
+};
+
+export default DashboardIndexPage;
