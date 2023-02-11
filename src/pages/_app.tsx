@@ -1,17 +1,17 @@
 import { AppProps } from "next/app";
 import Head from "next/head";
+import type { NextPage } from "next";
 import {
   MantineProvider,
-  AppShell,
   ColorSchemeProvider,
   ColorScheme,
 } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
-import { AppHeader } from "@/components/Layout/AppHeader";
 import { useLocalStorage } from "@mantine/hooks";
+import { DefaultLayout } from "@/components/Layout/DefaultLayout";
+import type { AppPropsWithLayout } from 'next/app'
 
-export default function App(props: AppProps) {
-  const { Component, pageProps } = props;
+export default function _App({ Component, pageProps }: AppPropsWithLayout) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: "mantine-color-scheme",
     defaultValue: "light",
@@ -19,6 +19,8 @@ export default function App(props: AppProps) {
   });
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
+  const getLayout =
+    Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
   return (
     <>
@@ -49,19 +51,7 @@ export default function App(props: AppProps) {
           }}
         >
           <NotificationsProvider>
-            <AppShell
-              header={<AppHeader />}
-              styles={(theme) => ({
-                main: {
-                  backgroundColor:
-                    theme.colorScheme === "dark"
-                      ? theme.colors.dark[8]
-                      : "#fff",
-                },
-              })}
-            >
-              <Component {...pageProps} />
-            </AppShell>
+            {getLayout(<Component {...pageProps} />)}
           </NotificationsProvider>
         </MantineProvider>
       </ColorSchemeProvider>

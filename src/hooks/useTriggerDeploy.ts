@@ -6,6 +6,7 @@ export const useTriggerDeploy = () => {
   assertExists(url);
 
   const trigger = async () => {
+    if (process.env.NODE_ENV === "development") return;
     const res = await fetch(url, { method: "POST" });
     console.log(res);
   };

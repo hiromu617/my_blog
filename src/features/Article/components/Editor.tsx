@@ -1,5 +1,4 @@
-import type { NextPage } from "next";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, FC } from "react";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
 import {
   Textarea,
@@ -15,85 +14,71 @@ import {
   useMantineColorScheme,
   Collapse,
 } from "@mantine/core";
-import { supabase } from "@/lib/supabaseClient";
 import { useLocalStorage } from "@mantine/hooks";
-import { showNotification } from "@mantine/notifications";
-import { InferGetServerSidePropsType } from "next";
+import { Tag } from "@/features/types";
 import { z } from "zod";
-import { assertExists } from "@/utils/assert";
-import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
+import { articleSchema } from "../schema/articleSchema";
 
-type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
+type ArticleParams = z.infer<typeof articleSchema>;
 
-const schema = z.object({
-  title: z.string().min(1).max(25),
-  slug: z
-    .string()
-    .min(1)
-    .max(15)
-    .regex(/^[0-9a-zA-Z]*$/),
-  content: z.string().min(1),
-});
+type Props = {
+  tags: Tag[];
+  lsKey: string;
+  handleSubmit: (
+    articleParams: ArticleParams,
+    tagIds: number[]
+  ) => Promise<void>;
+  initialTitle?: string;
+  initialContent?: string;
+  initialSlug?: string;
+  initialTagIds?: number[];
+  isEdit?: boolean;
+};
 
-const EditorPage: NextPage<Props> = ({ tags }) => {
+export const Editor: FC<Props> = ({
+  tags,
+  lsKey,
+  handleSubmit,
+  initialTitle,
+  initialContent,
+  initialSlug,
+  initialTagIds,
+  isEdit,
+}) => {
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
-  const { trigger } = useTriggerDeploy();
   const [isShowPreview, setIsShowPreview] = useState(false);
   const [tagInputOpened, setTagInputOpened] = useState(false);
-  const [selectedTagId, setSelectedTagId] = useState<number[]>([]);
+  const [selectedTagId, setSelectedTagId] = useState<number[]>(
+    initialTagIds ?? []
+  );
   const [html, setHtml] = useState("");
-  const [slug, setSlug] = useState("");
+  const [slug, setSlug] = useState(initialSlug ?? "");
   const [markdown, setMarkdown] = useLocalStorage({
-    key: "article-under-edit",
-    defaultValue: "",
+    key: lsKey,
+    defaultValue: initialContent ?? "",
     getInitialValueInEffect: true,
   });
   const [title, setTitle] = useLocalStorage({
-    key: "article-title-under-edit",
-    defaultValue: "",
+    key: lsKey + "-title",
+    defaultValue: initialTitle ?? "",
     getInitialValueInEffect: true,
   });
 
-  const handlePublish = async () => {
-    // TODO: webhookでbuild
-    const result = schema.safeParse({ title, content: markdown, slug });
+  const onSubmit = async () => {
+    const result = articleSchema.safeParse({ title, content: markdown, slug });
     if (!result.success) {
       alert(result.error.message);
       return;
     }
-    const { data: articles, error } = await supabase
-      .from("articles")
-      .insert({
-        ...result.data,
-        published_at: new Date().toLocaleString(),
-      })
-      .select();
-    assertExists(articles?.[0]);
-
-    const { error: errorOnCreateRelation } = await supabase
-      .from("article_tags")
-      .insert(
-        selectedTagId.map((tag_id) => ({ tag_id, article_id: articles[0].id }))
-      );
-
-    if (error) {
-      alert(error.message);
-      return;
+    await handleSubmit(result.data, selectedTagId);
+    if (!isEdit) {
+      setHtml("");
+      setMarkdown("");
+      setTitle("");
+      setSlug("");
+      setSelectedTagId([]);
     }
-    if (errorOnCreateRelation) {
-      alert(errorOnCreateRelation.message);
-      return;
-    }
-    showNotification({
-      title: "success",
-      message: "",
-    });
-    setTitle("");
-    setMarkdown("");
-    setSlug("");
-    setSelectedTagId([]);
-    trigger();
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -130,9 +115,9 @@ const EditorPage: NextPage<Props> = ({ tags }) => {
             color={dark ? "blue" : "dark"}
             radius="md"
             size="md"
-            onClick={handlePublish}
+            onClick={onSubmit}
           >
-            公開する
+            {isEdit ? "更新する" : "公開する"}
           </Button>
         </Group>
         <Button onClick={() => setTagInputOpened((o) => !o)} variant="subtle">
@@ -187,16 +172,4 @@ const EditorPage: NextPage<Props> = ({ tags }) => {
       </Stack>
     </Container>
   );
-};
-
-export default EditorPage;
-
-export const getServerSideProps = async () => {
-  const { data: tags } = await supabase.from("tags").select("*");
-
-  return {
-    props: {
-      tags,
-    },
-  };
 };
