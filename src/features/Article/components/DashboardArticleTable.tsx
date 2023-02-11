@@ -1,10 +1,11 @@
 import { FC, useState } from "react";
-import { Anchor, Table, Button, Center } from "@mantine/core";
+import { Anchor, Table, Button, Center, ActionIcon } from "@mantine/core";
 import { ArticleWithTags } from "@/features/types";
 import { NextLink } from "@mantine/next";
 import { supabase } from "@/lib/supabaseClient";
 import { showNotification } from "@mantine/notifications";
 import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
+import { TbExternalLink } from "react-icons/tb";
 import { mutate } from "swr";
 
 type Props = {
@@ -55,6 +56,7 @@ export const DashboardArticleTable: FC<Props> = ({ articles }) => {
     <Table verticalSpacing="md" fontSize="md">
       <thead>
         <tr>
+          <th></th>
           <th>ステータス</th>
           <th>スラッグ</th>
           <th>タイトル</th>
@@ -64,6 +66,17 @@ export const DashboardArticleTable: FC<Props> = ({ articles }) => {
       <tbody>
         {articles.map((article) => (
           <tr key={article.slug}>
+            <td>
+              <Center>
+                <ActionIcon
+                  component={NextLink}
+                  href={`/${article.slug}`}
+                  legacyBehavior
+                >
+                  <TbExternalLink />
+                </ActionIcon>
+              </Center>
+            </td>
             <td>{article.published_at ? "公開中" : "非公開"}</td>
             <td>{article.slug}</td>
             <td>
