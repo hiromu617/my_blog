@@ -61,6 +61,7 @@ export const DashboardArticleTable: FC<Props> = ({ articles }) => {
           <th>スラッグ</th>
           <th>タイトル</th>
           <th>公開日</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>

@@ -2,7 +2,7 @@ import { InferGetServerSidePropsType, NextPage } from "next";
 import { assertExists } from "@/utils/assert";
 import { supabase } from "@/lib/supabaseClient";
 import { z } from "zod";
-import { useCallback } from "react";
+import { useCallback, ReactElement } from "react";
 import { Editor } from "@/features/Article/components/Editor";
 import { ArticleWithTagsForEdit } from "@/features/types";
 import { useRouter } from "next/router";
@@ -11,11 +11,17 @@ import { useAddTagsToArticle } from "@/features/Article/hooks/useAddTagsToArticl
 import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
 import { articleSchema } from "@/features/Article/schema/articleSchema";
 import { useDeleteTagsOnArticle } from "@/features/Article/hooks/useDeleteTagsOnArticle";
+import { DashboardLayout } from "@/components/Layout/DashboardLayout";
+import type { NextPageWithLayout } from "next";
 
 type ArticleParams = z.infer<typeof articleSchema>;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-const ArticleEditPage: NextPage<Props> = ({ article, tags, slug }) => {
+const ArticleEditPage: NextPageWithLayout<Props> = ({
+  article,
+  tags,
+  slug,
+}) => {
   const router = useRouter();
   const { trigger } = useTriggerDeploy();
   const { addTagsToArticle } = useAddTagsToArticle();
@@ -88,6 +94,10 @@ const ArticleEditPage: NextPage<Props> = ({ article, tags, slug }) => {
     />
   );
 };
+
+ArticleEditPage.getLayout = (page: ReactElement) => (
+  <DashboardLayout>{page}</DashboardLayout>
+);
 
 export default ArticleEditPage;
 

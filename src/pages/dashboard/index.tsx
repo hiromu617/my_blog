@@ -1,8 +1,10 @@
 import { Container } from "@mantine/core";
 import { supabase } from "@/lib/supabaseClient";
 import { NextPage } from "next";
+import { ReactElement } from "react";
 import { DashboardArticleTable } from "@/features/Article/components/DashboardArticleTable";
 import useSWR from "swr";
+import { DashboardLayout } from "@/components/Layout/DashboardLayout";
 import { ArticleWithTags } from "@/features/types";
 
 const fetcher = async () => {
@@ -27,7 +29,7 @@ const fetcher = async () => {
   return articles as ArticleWithTags[];
 };
 
-const DashboardIndexPage: NextPage = () => {
+const DashboardIndexPage = () => {
   const { data: articles, isLoading } = useSWR("/dashboard/articles", fetcher);
 
   return (
@@ -40,5 +42,9 @@ const DashboardIndexPage: NextPage = () => {
     </Container>
   );
 };
+
+DashboardIndexPage.getLayout = (page: ReactElement) => (
+  <DashboardLayout>{page}</DashboardLayout>
+);
 
 export default DashboardIndexPage;
