@@ -28,24 +28,40 @@ type Props = {
     articleParams: ArticleParams,
     tagIds: number[]
   ) => Promise<void>;
+  initialTitle?: string;
+  initialContent?: string;
+  initialSlug?: string;
+  initialTagIds?: number[];
+  isEdit?: boolean;
 };
 
-export const Editor: FC<Props> = ({ tags, lsKey, handleSubmit }) => {
+export const Editor: FC<Props> = ({
+  tags,
+  lsKey,
+  handleSubmit,
+  initialTitle,
+  initialContent,
+  initialSlug,
+  initialTagIds,
+  isEdit,
+}) => {
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   const [isShowPreview, setIsShowPreview] = useState(false);
   const [tagInputOpened, setTagInputOpened] = useState(false);
-  const [selectedTagId, setSelectedTagId] = useState<number[]>([]);
+  const [selectedTagId, setSelectedTagId] = useState<number[]>(
+    initialTagIds ?? []
+  );
   const [html, setHtml] = useState("");
-  const [slug, setSlug] = useState("");
+  const [slug, setSlug] = useState(initialSlug ?? "");
   const [markdown, setMarkdown] = useLocalStorage({
     key: lsKey,
-    defaultValue: "",
+    defaultValue: initialContent ?? "",
     getInitialValueInEffect: true,
   });
   const [title, setTitle] = useLocalStorage({
     key: lsKey + "-title",
-    defaultValue: "",
+    defaultValue: initialTitle ?? "",
     getInitialValueInEffect: true,
   });
 
@@ -56,11 +72,13 @@ export const Editor: FC<Props> = ({ tags, lsKey, handleSubmit }) => {
       return;
     }
     await handleSubmit(result.data, selectedTagId);
-    setHtml("");
-    setMarkdown("");
-    setTitle("");
-    setSlug("");
-    setSelectedTagId([]);
+    if (!isEdit) {
+      setHtml("");
+      setMarkdown("");
+      setTitle("");
+      setSlug("");
+      setSelectedTagId([]);
+    }
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +117,7 @@ export const Editor: FC<Props> = ({ tags, lsKey, handleSubmit }) => {
             size="md"
             onClick={onSubmit}
           >
-            公開する
+            {isEdit ? "更新する" : "公開する"}
           </Button>
         </Group>
         <Button onClick={() => setTagInputOpened((o) => !o)} variant="subtle">

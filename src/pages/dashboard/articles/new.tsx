@@ -8,7 +8,7 @@ import { showNotification } from "@mantine/notifications";
 import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
 import { articleSchema } from "@/features/Article/schema/articleSchema";
 import { z } from "zod";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Editor } from "@/features/Article/components/Editor";
 type ArticleParams = z.infer<typeof articleSchema>;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
