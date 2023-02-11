@@ -56,7 +56,6 @@ const EditorPage: NextPage<Props> = ({ tags }) => {
   });
 
   const handlePublish = async () => {
-    // TODO: webhookでbuild
     const result = schema.safeParse({ title, content: markdown, slug });
     if (!result.success) {
       alert(result.error.message);

@@ -69,7 +69,7 @@ export const DashboardArticleTable: FC<Props> = ({ articles }) => {
             <td>
               <Anchor
                 component={NextLink}
-                href={`/dashboard/${article.slug}/edit`}
+                href={`/dashboard/articles/${article.slug}/edit`}
                 legacyBehavior
               >
                 {article.title}
