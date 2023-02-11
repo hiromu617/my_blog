@@ -56,6 +56,11 @@ export const Editor: FC<Props> = ({ tags, lsKey, handleSubmit }) => {
       return;
     }
     await handleSubmit(result.data, selectedTagId);
+    setHtml("");
+    setMarkdown("");
+    setTitle("");
+    setSlug("");
+    setSelectedTagId([]);
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {

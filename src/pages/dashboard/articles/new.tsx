@@ -8,6 +8,7 @@ import { showNotification } from "@mantine/notifications";
 import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
 import { articleSchema } from "@/features/Article/schema/articleSchema";
 import { z } from "zod";
+import { useCallback, useState } from "react";
 import { Editor } from "@/features/Article/components/Editor";
 type ArticleParams = z.infer<typeof articleSchema>;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -17,33 +18,33 @@ const NewArticlePage: NextPage<Props> = ({ tags }) => {
   const { addTagsToArticle } = useAddTagsToArticle();
   const { trigger } = useTriggerDeploy();
 
-  const handlePublishNewArticle = async (
-    articleParams: ArticleParams,
-    tagIds: number[]
-  ) => {
-    const { newArticle, error } = await publishNewArticle(articleParams);
+  const handlePublishNewArticle = useCallback(
+    async (articleParams: ArticleParams, tagIds: number[]) => {
+      const { newArticle, error } = await publishNewArticle(articleParams);
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-    assertExists(newArticle);
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      assertExists(newArticle);
 
-    const { error: errorOnCreateRelation } = await addTagsToArticle({
-      tagIds: tagIds,
-      articleId: newArticle.id,
-    });
+      const { error: errorOnCreateRelation } = await addTagsToArticle({
+        tagIds: tagIds,
+        articleId: newArticle.id,
+      });
 
-    if (errorOnCreateRelation) {
-      alert(errorOnCreateRelation.message);
-      return;
-    }
-    showNotification({
-      title: "success",
-      message: "",
-    });
-    trigger();
-  };
+      if (errorOnCreateRelation) {
+        alert(errorOnCreateRelation.message);
+        return;
+      }
+      showNotification({
+        title: "success",
+        message: "",
+      });
+      trigger();
+    },
+    [publishNewArticle, addTagsToArticle, trigger]
+  );
 
   return (
     <Editor
