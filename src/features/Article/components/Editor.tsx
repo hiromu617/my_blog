@@ -29,13 +29,15 @@ type Props = {
   lsKey: string;
   handleSubmit: (
     articleParams: ArticleParams,
-    tagIds: number[]
+    tagIds: number[],
+    isToPublish: boolean
   ) => Promise<void>;
   initialTitle?: string;
   initialContent?: string;
   initialSlug?: string;
   initialTagIds?: number[];
   isEdit?: boolean;
+  isPublished?: boolean;
 };
 
 export const Editor: FC<Props> = ({
@@ -47,11 +49,13 @@ export const Editor: FC<Props> = ({
   initialSlug,
   initialTagIds,
   isEdit,
+  isPublished,
 }) => {
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   const [isShowPreview, setIsShowPreview] = useState(false);
   const [tagInputOpened, setTagInputOpened] = useState(false);
+  const [isToPublish, setIsToPublish] = useState(isPublished ?? false);
   const { uploadImage, isUploading } = useUploadImage();
   const [selectedTagId, setSelectedTagId] = useState<number[]>(
     initialTagIds ?? []
@@ -76,7 +80,7 @@ export const Editor: FC<Props> = ({
       alert(result.error.message);
       return;
     }
-    await handleSubmit(result.data, selectedTagId);
+    await handleSubmit(result.data, selectedTagId, isToPublish);
     if (!isEdit) {
       setHtml("");
       setMarkdown("");
@@ -143,13 +147,18 @@ export const Editor: FC<Props> = ({
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
           />
+          <Checkbox
+            label="公開する"
+            checked={isToPublish}
+            onChange={() => setIsToPublish(!isToPublish)}
+          />
           <Button
             color={dark ? "blue" : "dark"}
             radius="md"
             size="md"
             onClick={onSubmit}
           >
-            {isEdit ? "更新する" : "公開する"}
+            保存する
           </Button>
         </Group>
         <Button onClick={() => setTagInputOpened((o) => !o)} variant="subtle">
