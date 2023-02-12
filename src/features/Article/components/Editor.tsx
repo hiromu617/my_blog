@@ -13,17 +13,14 @@ import {
   Checkbox,
   useMantineColorScheme,
   Collapse,
-  Overlay,
-  Center,
-  Text,
   LoadingOverlay,
 } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { Tag } from "@/features/types";
 import { z } from "zod";
 import { articleSchema } from "../schema/articleSchema";
-import { supabase } from "@/lib/supabaseClient";
 import { assertExists } from "@/utils/assert";
+import { useUploadImage } from "../hooks/useUploadImage";
 
 type ArticleParams = z.infer<typeof articleSchema>;
 
@@ -55,7 +52,7 @@ export const Editor: FC<Props> = ({
   const dark = colorScheme === "dark";
   const [isShowPreview, setIsShowPreview] = useState(false);
   const [tagInputOpened, setTagInputOpened] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const { uploadImage, isUploading } = useUploadImage();
   const [selectedTagId, setSelectedTagId] = useState<number[]>(
     initialTagIds ?? []
   );
@@ -101,20 +98,15 @@ export const Editor: FC<Props> = ({
   const onDrop = async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
-    setIsUploading(true);
-    const { data, error } = await supabase.storage
-      .from("images-in-article")
-      .upload(files[0].name, files[0]);
-    if (!data && error) {
-      alert(error.message);
-      setIsUploading(false);
+    if (!files[0].type.startsWith("image/")) {
+      alert("not image");
       return;
     }
-    const {
-      data: { publicUrl },
-    } = await supabase.storage
-      .from("images-in-article")
-      .getPublicUrl(data.path);
+    const { publicUrl, error } = await uploadImage(files[0]);
+    if (error) {
+      alert(error);
+      return;
+    }
     assertExists(ref.current);
 
     const pos = ref.current.selectionStart;
@@ -125,7 +117,6 @@ export const Editor: FC<Props> = ({
       const after = markdown.slice(pos, markdown.length);
       return before + imageMarkdown + after;
     });
-    setIsUploading(false);
 
     e.dataTransfer.clearData();
   };
