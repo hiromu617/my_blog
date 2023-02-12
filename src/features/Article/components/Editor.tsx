@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FC } from "react";
+import { useState, ChangeEvent, FC, DragEvent } from "react";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
 import {
   Textarea,
@@ -90,8 +90,14 @@ export const Editor: FC<Props> = ({
     }
   };
 
+  const onDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    console.log(e.dataTransfer.files);
+    e.dataTransfer.clearData();
+  };
+
   return (
-    <Container size="sm">
+    <Container size="sm" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
       <Stack spacing="lg">
         <Group position="center">
           <Switch
