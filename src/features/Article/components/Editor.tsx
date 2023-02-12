@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FC, DragEvent } from "react";
+import { useState, ChangeEvent, FC, DragEvent, useRef } from "react";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
 import {
   Textarea,
@@ -13,11 +13,17 @@ import {
   Checkbox,
   useMantineColorScheme,
   Collapse,
+  Overlay,
+  Center,
+  Text,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
 import { Tag } from "@/features/types";
 import { z } from "zod";
 import { articleSchema } from "../schema/articleSchema";
+import { supabase } from "@/lib/supabaseClient";
+import { assertExists } from "@/utils/assert";
 
 type ArticleParams = z.infer<typeof articleSchema>;
 
@@ -49,6 +55,7 @@ export const Editor: FC<Props> = ({
   const dark = colorScheme === "dark";
   const [isShowPreview, setIsShowPreview] = useState(false);
   const [tagInputOpened, setTagInputOpened] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState<number[]>(
     initialTagIds ?? []
   );
@@ -64,6 +71,7 @@ export const Editor: FC<Props> = ({
     defaultValue: initialTitle ?? "",
     getInitialValueInEffect: true,
   });
+  const ref = useRef<HTMLTextAreaElement>(null);
 
   const onSubmit = async () => {
     const result = articleSchema.safeParse({ title, content: markdown, slug });
@@ -90,14 +98,41 @@ export const Editor: FC<Props> = ({
     }
   };
 
-  const onDrop = (e: DragEvent<HTMLDivElement>) => {
+  const onDrop = async (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    console.log(e.dataTransfer.files);
+    const files = e.dataTransfer.files;
+    setIsUploading(true);
+    const { data, error } = await supabase.storage
+      .from("images-in-article")
+      .upload(files[0].name, files[0]);
+    if (!data && error) {
+      alert(error.message);
+      setIsUploading(false);
+      return;
+    }
+    const {
+      data: { publicUrl },
+    } = await supabase.storage
+      .from("images-in-article")
+      .getPublicUrl(data.path);
+    assertExists(ref.current);
+
+    const pos = ref.current.selectionStart;
+    const imageMarkdown = `![alt](${publicUrl})`;
+
+    setMarkdown((markdown) => {
+      const before = markdown.slice(0, pos);
+      const after = markdown.slice(pos, markdown.length);
+      return before + imageMarkdown + after;
+    });
+    setIsUploading(false);
+
     e.dataTransfer.clearData();
   };
 
   return (
     <Container size="sm" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
+      <LoadingOverlay visible={isUploading} overlayBlur={2} />
       <Stack spacing="lg">
         <Group position="center">
           <Switch
@@ -164,6 +199,7 @@ export const Editor: FC<Props> = ({
               onChange={(e) => setTitle(e.target.value)}
             />
             <Textarea
+              ref={ref}
               minRows={30}
               autosize
               size="lg"
@@ -171,7 +207,7 @@ export const Editor: FC<Props> = ({
               onChange={(e) => {
                 setMarkdown(e.target.value);
               }}
-              style={{ width: "100%" }}
+              style={{ width: "100%", wordBreak: "break-all" }}
             />
           </>
         )}
