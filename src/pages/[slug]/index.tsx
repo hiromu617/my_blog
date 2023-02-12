@@ -14,12 +14,15 @@ import { supabase } from "@/lib/supabaseClient";
 import { ArticleWithTags } from "@/features/types";
 import { z } from "zod";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
+import { useRouter } from "next/router";
+import { TwitterShareButton, TwitterIcon } from "react-share";
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
 const ArticlePage: NextPage<Props> = ({ article, htmlContent }) => {
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
+  const router = useRouter();
 
   return (
     <Container size="sm">
@@ -44,6 +47,14 @@ const ArticlePage: NextPage<Props> = ({ article, htmlContent }) => {
             }}
           />
         </TypographyStylesProvider>
+        <Group m="auto" py={30}>
+          <TwitterShareButton
+            url={`${process.env.NEXT_PUBLIC_BASE_URL}${router.asPath}`}
+            title={article.title}
+          >
+            <TwitterIcon size={46} round />
+          </TwitterShareButton>
+        </Group>
       </Stack>
     </Container>
   );

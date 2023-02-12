@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { InferGetServerSidePropsType } from "next";
 import { useAddTagsToArticle } from "@/features/Article/hooks/useAddTagsToArticle";
-import { usePublishNewArticle } from "@/features/Article/hooks/usePublishNewArticle";
+import { useAddNewArticle } from "@/features/Article/hooks/useAddNewArticle";
 import { assertExists } from "@/utils/assert";
 import { showNotification } from "@mantine/notifications";
 import { useTriggerDeploy } from "@/hooks/useTriggerDeploy";
@@ -15,13 +15,20 @@ type ArticleParams = z.infer<typeof articleSchema>;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 const NewArticlePage: NextPageWithLayout<Props> = ({ tags }) => {
-  const { publishNewArticle } = usePublishNewArticle();
+  const { addNewArticle } = useAddNewArticle();
   const { addTagsToArticle } = useAddTagsToArticle();
   const { trigger } = useTriggerDeploy();
 
   const handlePublishNewArticle = useCallback(
-    async (articleParams: ArticleParams, tagIds: number[]) => {
-      const { newArticle, error } = await publishNewArticle(articleParams);
+    async (
+      articleParams: ArticleParams,
+      tagIds: number[],
+      isToPublish: boolean
+    ) => {
+      const { newArticle, error } = await addNewArticle(
+        articleParams,
+        isToPublish
+      );
 
       if (error) {
         alert(error.message);
@@ -44,7 +51,7 @@ const NewArticlePage: NextPageWithLayout<Props> = ({ tags }) => {
       });
       trigger();
     },
-    [publishNewArticle, addTagsToArticle, trigger]
+    [addNewArticle, addTagsToArticle, trigger]
   );
 
   return (

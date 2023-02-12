@@ -28,14 +28,16 @@ const ArticleEditPage: NextPageWithLayout<Props> = ({
   const { deleteTagsOnArticle } = useDeleteTagsOnArticle();
 
   const handleUpdateArticle = useCallback(
-    async (articleParams: ArticleParams, tagIds: number[]) => {
+    async (
+      articleParams: ArticleParams,
+      tagIds: number[],
+      isToPublish: boolean
+    ) => {
       const { data, error } = await supabase
         .from("articles")
         .update({
           ...articleParams,
-          published_at: !article.published_at
-            ? new Date().toLocaleString()
-            : undefined,
+          published_at: isToPublish ? new Date().toLocaleString() : undefined,
         })
         .eq("slug", slug);
       if (error) {
@@ -89,6 +91,7 @@ const ArticleEditPage: NextPageWithLayout<Props> = ({
       initialContent={article.content}
       initialSlug={article.slug}
       initialTagIds={article.tags.map((t) => t.id)}
+      isPublished={!!article.published_at}
       handleSubmit={handleUpdateArticle}
       isEdit
     />
