@@ -211,10 +211,10 @@
   dependencies:
     "@floating-ui/dom" "^1.1.0"
 
-"@hiromu617/markdown-parser@1.0.1":
-  version "1.0.1"
-  resolved "https://npm.pkg.github.com/download/@hiromu617/markdown-parser/1.0.1/e791eafda4fddbac4e8c0d1834126394803af3cb#e791eafda4fddbac4e8c0d1834126394803af3cb"
-  integrity sha512-m/l8KYgpg0u0tMDOihLZwoq66dV4E1g/VlU2+mLBo9jk3UotN1TFN6mirhRxg7mBRGeoDT0QknZ5Qfoqcri2RQ==
+"@hiromu617/markdown-parser@1.1.0":
+  version "1.1.0"
+  resolved "https://npm.pkg.github.com/download/@hiromu617/markdown-parser/1.1.0/a8b11777eec40007e06f73965c1ec791a585bdb9#a8b11777eec40007e06f73965c1ec791a585bdb9"
+  integrity sha512-63zyrbHfccSkgLI13xV/GemriIRxEEi004ahmq7b9kiYXsHNPr2dggijoPfqquPNMPe6KV/0nRkdwdspZHwEgA==
 
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"

@@ -125,6 +125,16 @@ export const Editor: FC<Props> = ({
     e.dataTransfer.clearData();
   };
 
+  const onIsShowPreviewSwitchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsShowPreview(e.target.checked);
+    const html = convertToHTMLString(markdown, {
+      customRenderUrl: (url) => {
+        return `<div><a href="${url}" target="_blank">${url}</a></div>`;
+      },
+    });
+    setHtml(html);
+  };
+
   return (
     <Container size="sm" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
       <LoadingOverlay visible={isUploading} overlayBlur={2} />
@@ -135,11 +145,7 @@ export const Editor: FC<Props> = ({
             size="lg"
             color={dark ? "blue" : "dark"}
             checked={isShowPreview}
-            onChange={(e) => {
-              setIsShowPreview(e.target.checked);
-              const html = convertToHTMLString(markdown);
-              setHtml(html);
-            }}
+            onChange={onIsShowPreviewSwitchChange}
           />
           <Input
             size="md"
