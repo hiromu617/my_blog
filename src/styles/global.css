@@ -1,0 +1,67 @@
+.ogpCard {
+  display: flex;
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-4);
+  height: 120px;
+  overflow: hidden;
+  justify-content: space-between;
+  margin: 20px 0;
+  background-color: var(--mantine-color-white);
+}
+
+.ogpCardWrapper:hover {
+  text-decoration: none !important;
+}
+
+.ogImg {
+  max-width: 200px;
+  height: 120px;
+  margin: 0;
+}
+
+.ogpContainer {
+  min-width: 0;
+  flex: 1;
+  padding: 8px 12px;
+}
+
+.ogpContainer:hover {
+  background-color: var(--mantine-color-gray-1);
+}
+
+.ogpCard div h1 {
+  font-size: var(--mantine-h4-font-size);
+  line-height: var(--mantine-h4-line-height);
+  margin: 0 0 8px;
+  color: var(--mantine-color-black);
+}
+
+.ogpDesc {
+  font-size: var(--mantine-font-size-sm);
+  margin: 0 0 5px;
+  padding: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--mantine-color-gray-7);
+}
+
+.favicon {
+  width: 16px;
+  height: 16px;
+}
+
+.domainContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mantine-color-black);
+}
+
+.domainContainer img {
+  margin-bottom: 0px;
+}
+
+.domainContainer div {
+  font-size: var(--mantine-font-size-xs);
+}

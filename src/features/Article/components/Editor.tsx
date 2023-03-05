@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, FC, DragEvent, useRef } from "react";
-import { convertToHTMLString } from "@hiromu617/markdown-parser";
+import { convertToHtmlWithOgpCard } from "@/utils/convertHtmlWithOgpCard";
 import {
   Textarea,
   Switch,
@@ -21,7 +21,6 @@ import { z } from "zod";
 import { articleSchema } from "../schema/articleSchema";
 import { assertExists } from "@/utils/assert";
 import { useUploadImage } from "../hooks/useUploadImage";
-
 type ArticleParams = z.infer<typeof articleSchema>;
 
 type Props = {
@@ -125,6 +124,15 @@ export const Editor: FC<Props> = ({
     e.dataTransfer.clearData();
   };
 
+  const onIsShowPreviewSwitchChange = async (
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsShowPreview(e.target.checked);
+
+    const html = await convertToHtmlWithOgpCard(markdown);
+    setHtml(html);
+  };
+
   return (
     <Container size="sm" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
       <LoadingOverlay visible={isUploading} overlayBlur={2} />
@@ -135,11 +143,7 @@ export const Editor: FC<Props> = ({
             size="lg"
             color={dark ? "blue" : "dark"}
             checked={isShowPreview}
-            onChange={(e) => {
-              setIsShowPreview(e.target.checked);
-              const html = convertToHTMLString(markdown);
-              setHtml(html);
-            }}
+            onChange={onIsShowPreviewSwitchChange}
           />
           <Input
             size="md"
