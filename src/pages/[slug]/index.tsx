@@ -13,10 +13,9 @@ import { assertExists } from "@/utils/assert";
 import { supabase } from "@/lib/supabaseClient";
 import { ArticleWithTags } from "@/features/types";
 import { z } from "zod";
-import { convertToHTMLString } from "@hiromu617/markdown-parser";
 import { useRouter } from "next/router";
 import { TwitterShareButton, TwitterIcon } from "react-share";
-
+import { convertToHtmlWithOgpCardForServer } from "@/utils/convertToHtmlWithOgpCardForServer";
 type Props = InferGetStaticPropsType<typeof getStaticProps>;
 
 const ArticlePage: NextPage<Props> = ({ article, htmlContent }) => {
@@ -92,7 +91,7 @@ export const getStaticProps = async (context: any) => {
   assertExists(articles?.[0]);
 
   const article = articles[0];
-  const htmlContent = convertToHTMLString(article.content);
+  const htmlContent = await convertToHtmlWithOgpCardForServer(article.content);
 
   return {
     props: {

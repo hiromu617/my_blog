@@ -1,21 +1,65 @@
-import { Data } from "./../pages/api/ogpData";
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
+import openGraphScraper from "open-graph-scraper";
 import { getDomainFromUrl } from "./getDomainFromUrl";
+import { Data } from "./../pages/api/ogpData";
 
-const getOgpData = async (rawUrls: string[]): Promise<Data> => {
-  const searchParams = new URLSearchParams();
-  rawUrls.forEach((rawUrl) => searchParams.append("urls", rawUrl));
-  const res = await fetch("/api/ogpData/?" + searchParams.toString());
-  const json: Data = await res.json();
-
-  return json;
+export type OgpData = {
+  title: string;
+  description: string;
+  image: ImageObject | null;
+  requestUrl: string;
 };
 
-export const convertToHtmlWithOgpCard = async (markdown: string) => {
+export type ImageObject = {
+  height?: string | number;
+  type: string;
+  url: string;
+  width?: string | number;
+};
+
+export const getOgpDataForServer = async (rawUrls: string[]): Promise<Data> => {
+  const response: (OgpData | null)[] = [];
+
+  await Promise.all(
+    rawUrls.map(async (url) => {
+      try {
+        const { result, error } = await openGraphScraper({
+          url,
+          onlyGetOpenGraphInfo: true,
+        });
+
+        console.log(result);
+
+        if (result.success && !error) {
+          const image = result.ogImage as ImageObject;
+
+          if (!result.ogTitle || !result.ogDescription || !result.requestUrl)
+            return response.push(null);
+
+          const ogpData = {
+            title: result.ogTitle as string,
+            description: result.ogDescription as string,
+            image: image ?? null,
+            requestUrl: result.requestUrl,
+          };
+          response.push(ogpData);
+        } else {
+          response.push(null);
+        }
+      } catch {
+        response.push(null);
+      }
+    })
+  );
+
+  return { ogpData: response };
+};
+
+export const convertToHtmlWithOgpCardForServer = async (markdown: string) => {
   const regUrl = /(?<!\()https?:\/\/[-_.!~*\\'()a-zA-Z0-9;\\/?:\\@&=+\\$,%#]+/g;
   const rawUrls = markdown.split("\n").filter((row) => row.match(regUrl));
 
-  const { ogpData } = await getOgpData(rawUrls);
+  const { ogpData } = await getOgpDataForServer(rawUrls);
 
   let html = convertToHTMLString(markdown);
 
