@@ -1,6 +1,4 @@
-import { AppProps } from "next/app";
 import Head from "next/head";
-import type { NextPage } from "next";
 import {
   MantineProvider,
   ColorSchemeProvider,
@@ -9,7 +7,8 @@ import {
 import { NotificationsProvider } from "@mantine/notifications";
 import { useLocalStorage } from "@mantine/hooks";
 import { DefaultLayout } from "@/components/Layout/DefaultLayout";
-import type { AppPropsWithLayout } from 'next/app'
+import "@/styles/global.css";
+import type { AppPropsWithLayout } from "next/app";
 
 export default function _App({ Component, pageProps }: AppPropsWithLayout) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -37,6 +36,7 @@ export default function _App({ Component, pageProps }: AppPropsWithLayout) {
       >
         <MantineProvider
           withGlobalStyles
+          withCSSVariables
           withNormalizeCSS
           theme={{
             colorScheme,

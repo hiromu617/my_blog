@@ -57,6 +57,21 @@ type ImageObject = {
   width?: string | number;
 };
 
+const getDomainFromUrl = (url: string | undefined): string | undefined => {
+  if (!url) return undefined;
+  let result;
+  let match;
+  match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?=]+)/im);
+  if (match) {
+    result = match[1];
+    match = result.match(/^[^.]+\.(.+\..+)$/);
+    if (match) {
+      result = match[1];
+    }
+  }
+  return result;
+};
+
 const convertToHtmlWithOgpCard = async (markdown: string) => {
   const regUrl = /(?<!\()https?:\/\/[-_.!~*\\'()a-zA-Z0-9;\\/?:\\@&=+\\$,%#]+/g;
   const rawUrls = markdown.split("\n").filter((row) => row.match(regUrl));
@@ -72,6 +87,7 @@ const convertToHtmlWithOgpCard = async (markdown: string) => {
 
   rawUrls.forEach((rawUrl, i) => {
     const ogp = ogpData.find((d) => d?.requestUrl === rawUrl);
+    const domain = getDomainFromUrl(rawUrl);
     if (!ogp) {
       html = html.replaceAll(
         `<p>${rawUrl}</p>`,
@@ -79,10 +95,17 @@ const convertToHtmlWithOgpCard = async (markdown: string) => {
       );
     } else {
       // TODO: card
-      html = html.replaceAll(
-        `<p>${rawUrl}</p>`,
-        `<div><a href="${rawUrl}" target="_blank">${ogp.title}</a></div>`
-      );
+      if (ogp.image) {
+        html = html.replaceAll(
+          `<p>${rawUrl}</p>`,
+          `<a href='${rawUrl}' target="_blank" class="ogpCardWrapper"><div class="ogpCard"><img class="ogImg" src='${ogp.image.url}'/><div class="ogpContainer"><h1>${ogp.title}</h1><div class="ogpDesc">${ogp.description}</div><div class="domainContainer"><img class="favicon" src="https://www.google.com/s2/u/0/favicons?domain=${rawUrl}" alt="${rawUrl}"/><div>${domain}</div></div></div></div></a>`
+        );
+      } else {
+        html = html.replaceAll(
+          `<p>${rawUrl}</p>`,
+          `<a href='${rawUrl}' target="_blank" class="ogpCardWrapper"><div class="ogpCard"><div class="ogpContainer"><h1>${ogp.title}</h1><div class="ogpDesc">${ogp.description}</div><div class="domainContainer"><img class="favicon" src="https://www.google.com/s2/u/0/favicons?domain=${rawUrl}" alt="${rawUrl}"/><div>${domain}</div></div></div></div></a>`
+        );
+      }
     }
   });
 
