@@ -21,7 +21,6 @@ import { z } from "zod";
 import { articleSchema } from "../schema/articleSchema";
 import { assertExists } from "@/utils/assert";
 import { useUploadImage } from "../hooks/useUploadImage";
-
 type ArticleParams = z.infer<typeof articleSchema>;
 
 type Props = {
@@ -38,6 +37,56 @@ type Props = {
   initialTagIds?: number[];
   isEdit?: boolean;
   isPublished?: boolean;
+};
+
+type Data = {
+  ogpData: (OgpData | null)[];
+};
+
+type OgpData = {
+  title: string;
+  description: string;
+  image: ImageObject | null;
+  requestUrl: string;
+};
+
+type ImageObject = {
+  height?: string | number;
+  type: string;
+  url: string;
+  width?: string | number;
+};
+
+const convertToHtmlWithOgpCard = async (markdown: string) => {
+  const regUrl = /(?<!\()https?:\/\/[-_.!~*\\'()a-zA-Z0-9;\\/?:\\@&=+\\$,%#]+/g;
+  const rawUrls = markdown.split("\n").filter((row) => row.match(regUrl));
+
+  const searchParams = new URLSearchParams();
+  rawUrls.forEach((rawUrl) => searchParams.append("urls", rawUrl));
+
+  const res = await fetch("/api/ogpData/?" + searchParams.toString());
+  const json: Data = await res.json();
+  const ogpData = json.ogpData;
+
+  let html = convertToHTMLString(markdown);
+
+  rawUrls.forEach((rawUrl, i) => {
+    const ogp = ogpData.find((d) => d?.requestUrl === rawUrl);
+    if (!ogp) {
+      html = html.replaceAll(
+        `<p>${rawUrl}</p>`,
+        `<div><a href="${rawUrl}" target="_blank">${rawUrl}</a></div>`
+      );
+    } else {
+      // TODO: card
+      html = html.replaceAll(
+        `<p>${rawUrl}</p>`,
+        `<div><a href="${rawUrl}" target="_blank">${ogp.title}</a></div>`
+      );
+    }
+  });
+
+  return html;
 };
 
 export const Editor: FC<Props> = ({
@@ -125,13 +174,12 @@ export const Editor: FC<Props> = ({
     e.dataTransfer.clearData();
   };
 
-  const onIsShowPreviewSwitchChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onIsShowPreviewSwitchChange = async (
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
     setIsShowPreview(e.target.checked);
-    const html = convertToHTMLString(markdown, {
-      customRenderUrl: (url) => {
-        return `<div><a href="${url}" target="_blank">${url}</a></div>`;
-      },
-    });
+
+    const html = await convertToHtmlWithOgpCard(markdown);
     setHtml(html);
   };
 

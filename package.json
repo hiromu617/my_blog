@@ -34,6 +34,8 @@
     "zod": "^3.20.2"
   },
   "devDependencies": {
+    "@types/open-graph-scraper": "^4.8.2",
+    "open-graph-scraper": "^5.1.0",
     "supabase": "^1.34.5"
   }
 }
