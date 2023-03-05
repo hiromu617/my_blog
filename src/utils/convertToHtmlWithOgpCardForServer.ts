@@ -1,5 +1,4 @@
 import { convertToHTMLString } from "@hiromu617/markdown-parser";
-import openGraphScraper from "open-graph-scraper";
 import { getDomainFromUrl } from "./getDomainFromUrl";
 import { Data } from "./../pages/api/ogpData";
 
@@ -19,6 +18,7 @@ export type ImageObject = {
 
 export const getOgpDataForServer = async (rawUrls: string[]): Promise<Data> => {
   const response: (OgpData | null)[] = [];
+  const openGraphScraper = require('open-graph-scraper')
 
   await Promise.all(
     rawUrls.map(async (url) => {
