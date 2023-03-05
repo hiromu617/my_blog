@@ -1,5 +1,6 @@
 import openGraphScraper from "open-graph-scraper";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { assertExists } from "@/utils/assert";
 
 type Data = {
   ogpData: (OgpData | null)[];
@@ -19,12 +20,23 @@ type ImageObject = {
   width?: string | number;
 };
 
+const isArray = <T>(maybeArray: T | readonly T[]): maybeArray is T[] => {
+  return Array.isArray(maybeArray);
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
   // FIXME: use zod validation
-  const urls = req.query.urls as string[];
+  let urls: string[];
+  assertExists(req.query.urls);
+  if (Array.isArray(req.query.urls)) {
+    urls = req.query.urls;
+  } else {
+    urls = [req.query.urls];
+  }
+
   const response: (OgpData | null)[] = [];
 
   await Promise.all(
